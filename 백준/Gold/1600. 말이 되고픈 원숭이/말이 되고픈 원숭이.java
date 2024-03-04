@@ -7,9 +7,8 @@ import java.util.StringTokenizer;
 
 public class Main {
 	static int K;
-	static int W; // 가로
-	static int H; // 세로
-	static int[][] arr; // 격자판 (0 : 아무것도 없는 평지, 1 : 장애물)
+	static int W, H;
+	static int[][] arr;
 	
 	static int[][] horse = {{-1, -2}, {-2, -1}, {-2, 1}, {-1, 2}, {1, -2}, {2, -1}, {2, 1}, {1, 2}};
 	static int[][] monkey = {{1, 0}, {0, 1}, {-1, 0}, {0, -1}};
@@ -33,63 +32,65 @@ public class Main {
 			}
 		}
 		
-		System.out.println(bfs(0, 0)); // 원숭이의 동작수의 최솟값
+		System.out.println(bfs(0, 0));
 	}
 
-	private static int bfs(int i, int j) {
+	private static int bfs(int x, int y) {
 		Queue<int[]> queue = new LinkedList<>();
 		int[][][] visited = new int[H][W][K + 1];
-		for(int h = 0; h < H; h++) {
-			for(int w = 0; w < W; w++) {
-				Arrays.fill(visited[h][w], -1);
+		for(int i = 0; i < H; i++) {
+			for(int j = 0; j < W; j++) {
+				Arrays.fill(visited[i][j], -1);
 			}
 		}
 		
-		queue.offer(new int[] {i, j, 0});
-		visited[i][j][0] = 0;
+		queue.offer(new int[] {x, y, 0});
+		visited[x][y][0] = 0;
 		
 		while(!queue.isEmpty()) {
-			int[] q = queue.poll();
-			int x = q[0], y = q[1], k = q[2];
+			int[] info = queue.poll();
+			x = info[0];
+			y = info[1];
+			int z = info[2];
 			
 			if(x == H - 1 && y == W - 1) {
-				return visited[x][y][k];
+				return visited[x][y][z];
 			}
 			
-			if(k < K) { // 말의 이동방법으로 갈 수 있는 횟수가 남았다면
-				for(int d = 0; d < 8; d++) {
+			if(z < K) { // 말의 움직임으로 이동 가능
+				for(int d = 0; d < horse.length; d++) {
 					int nx = x + horse[d][0], ny = y + horse[d][1];
 					
-					if(!checkArea(nx, ny)) { // 범위 밖
+					if(!checkArea(nx, ny)) {
 						continue;
 					}
-					if(arr[nx][ny] == 1) { // 장애물
+					if(visited[nx][ny][z + 1] != -1) {
 						continue;
 					}
-					if(visited[nx][ny][k + 1] != -1) { // 이미 방문
+					if(arr[nx][ny] != 0) {
 						continue;
 					}
 					
-					queue.offer(new int[] {nx, ny, k + 1});
-					visited[nx][ny][k + 1] = visited[x][y][k] + 1;
+					queue.offer(new int[] {nx, ny, z + 1});
+					visited[nx][ny][z + 1] = visited[x][y][z] + 1;
 				}
 			}
 			
-			for(int d = 0; d < 4; d++) {
+			for(int d = 0; d < monkey.length; d++) {
 				int nx = x + monkey[d][0], ny = y + monkey[d][1];
-				
-				if(!checkArea(nx, ny)) { // 범위 밖
+					
+				if(!checkArea(nx, ny)) {
 					continue;
 				}
-				if(arr[nx][ny] == 1) { // 장애물
+				if(visited[nx][ny][z] != -1) {
 					continue;
 				}
-				if(visited[nx][ny][k] != -1) { // 이미 방문
+				if(arr[nx][ny] != 0) {
 					continue;
 				}
-				
-				queue.offer(new int[] {nx, ny, k});
-				visited[nx][ny][k] = visited[x][y][k] + 1;
+					
+				queue.offer(new int[] {nx, ny, z});
+				visited[nx][ny][z] = visited[x][y][z] + 1;
 			}
 		}
 		
