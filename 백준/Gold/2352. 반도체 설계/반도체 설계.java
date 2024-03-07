@@ -14,7 +14,6 @@ public class Main {
 		
 		N = Integer.parseInt(br.readLine());
 		lis = new int[N];
-		Arrays.fill(lis, N + 1); // 최댓값 + 1 로 설정
 		size = 0;
 		
 		st = new StringTokenizer(br.readLine(), " ");
