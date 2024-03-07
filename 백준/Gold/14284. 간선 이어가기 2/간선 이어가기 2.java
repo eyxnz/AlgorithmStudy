@@ -17,14 +17,14 @@ class Edge implements Comparable<Edge> {
 
 	@Override
 	public int compareTo(Edge o) {
-		return Integer.compare(node, o.cost);
+		return Integer.compare(cost, o.cost);
 	}
 }
 
 public class Main {
 	static int N, M;
-	static int s, t;
 	static List<Edge>[] edges;
+	static int S, T;
 	
 	public static void main(String[] args) throws Exception {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -50,32 +50,34 @@ public class Main {
 		}
 		
 		st = new StringTokenizer(br.readLine(), " ");
-		s = Integer.parseInt(st.nextToken());
-		t = Integer.parseInt(st.nextToken());
+		S = Integer.parseInt(st.nextToken());
+		T = Integer.parseInt(st.nextToken());
 		
-		System.out.println(dijkstra(s, t));
+		System.out.println(dijkstra());
 	}
 
-	private static int dijkstra(int start, int end) {
+	private static int dijkstra() {
 		PriorityQueue<Edge> pq = new PriorityQueue<>();
+		boolean[] visited = new boolean[N + 1];
 		int[] dist = new int[N + 1];
 		Arrays.fill(dist, Integer.MAX_VALUE);
 		
-		pq.offer(new Edge(start, 0));
-		dist[start] = 0;
+		pq.offer(new Edge(S, 0));
+		dist[S] = 0;
 		
 		while(!pq.isEmpty()) {
 			Edge now = pq.poll();
 			int node = now.node;
 			int cost = now.cost;
 			
-			if(cost > dist[node]) {
+			if(visited[node]) {
 				continue;
 			}
+			visited[node] = true;
 			
 			for(Edge adj : edges[node]) {
 				int adjNode = adj.node;
-				int newCost = adj.cost + cost;
+				int newCost = cost + adj.cost;
 				
 				if(newCost >= dist[adjNode]) {
 					continue;
@@ -86,6 +88,6 @@ public class Main {
 			}
 		}
 		
-		return dist[end];
+		return dist[T];
 	}
 }
