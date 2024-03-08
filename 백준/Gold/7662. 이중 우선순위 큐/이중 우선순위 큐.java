@@ -15,7 +15,7 @@ class Num implements Comparable<Num> {
 	@Override
 	public int compareTo(Num o) {
 		if(Integer.compare(num, o.num) == 0) {
-			return Integer.compare(index, o.index);
+			return Integer.compare(index, o.index); // 이 기준까지 추가해야 TreeSet 에서 중복된 숫자가 들어갈 수 있음
 		}
 		return Integer.compare(num, o.num);
 	}
