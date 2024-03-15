@@ -69,6 +69,7 @@ public class Main {
 			best++;
 		}
 		
+		int cnt = 0;
 		while(!bestPQ.isEmpty()) {
 			Edge edge = bestPQ.poll();
 			int a = edge.a;
@@ -81,6 +82,11 @@ public class Main {
 			
 			if(c == 0) {
 				best++;
+			}
+			
+			cnt++;
+			if(cnt == N) { // 모든 정점 연결 완료
+				break;
 			}
 		}
 		
@@ -96,6 +102,7 @@ public class Main {
 			worst++;
 		}
 				
+		cnt = 0;
 		while(!worstPQ.isEmpty()) {
 			Edge edge = worstPQ.poll();
 			int a = edge.a;
@@ -108,6 +115,11 @@ public class Main {
 					
 			if(c == 0) {
 				worst++;
+			}
+			
+			cnt++;
+			if(cnt == N) { // 모든 정점 연결 완료
+				break;
 			}
 		}
 				
