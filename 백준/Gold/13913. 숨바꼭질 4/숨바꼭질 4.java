@@ -7,16 +7,31 @@ public class Main {
 	
 	public static void main(String[] args) throws Exception {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		StringBuilder sb = new StringBuilder();
 		StringTokenizer st;
 		
 		st = new StringTokenizer(br.readLine(), " ");
 		N = Integer.parseInt(st.nextToken());
 		K = Integer.parseInt(st.nextToken());
 		
-		bfs();
+		if(N >= K) { // -1만 가능
+			sb.append(N - K).append("\n");
+			for(int i = N; i >= K; i--) {
+				sb.append(i).append(" ");
+			}
+		} else {
+			List<Integer> answer = bfs();
+			
+			sb.append(answer.size() - 1).append("\n");
+			for(int i = answer.size() - 1; i >= 0; i--) {
+				sb.append(answer.get(i)).append(" ");
+			}
+		}
+		
+		System.out.println(sb.toString());
 	}
 
-	private static void bfs() {
+	private static List<Integer> bfs() {
 		Queue<Integer> queue = new LinkedList<>();
 		int[] visited = new int[2 * MAX + 1];
 		Arrays.fill(visited, Integer.MAX_VALUE);
@@ -28,21 +43,14 @@ public class Main {
 			int now = queue.poll(); // 현재 위치
 			
 			if(now == K) {
-				StringBuilder sb = new StringBuilder();
 				List<Integer> answer = new ArrayList<>();
 				
 				do {
 					answer.add(now);
 					now = visited[now];
 				} while(now != -1);
-				
-				sb.append(answer.size() - 1).append("\n");
-				for(int i = answer.size() - 1; i >= 0; i--) {
-					sb.append(answer.get(i)).append(" ");
-				}
-				
-				System.out.println(sb.toString());
-				return;
+
+				return answer;
 			}
 			
 			int[] dir = {-1, 1, now};
@@ -60,5 +68,7 @@ public class Main {
 				visited[next] = now;
 			}
 		}
+		
+		return null;
 	}
 }
