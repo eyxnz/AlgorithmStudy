@@ -14,4 +14,5 @@ select e.emp_no, e.emp_name,
         else 0
     end as bonus
 from hr_employees e join hr_grade g on e.emp_no = g.emp_no
-group by e.emp_no;
+group by e.emp_no
+order by e.emp_no;
