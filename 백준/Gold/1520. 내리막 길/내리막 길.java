@@ -35,14 +35,11 @@ public class Main {
 	}
 
 	private static int sol(int x, int y) {
-		if(x == 0 && y == 0) {
-			return 1;
-		}
-		if(dp[x][y] != Integer.MAX_VALUE) {
+		if(dp[x][y] != Integer.MAX_VALUE) { // 이미 계산된 칸
 			return dp[x][y];
 		}
 		
-		dp[x][y] = 0;
+		dp[x][y] = 0; // 방문 표시
 		for(int d = 0; d < dir.length; d++) {
 			int nx = x + dir[d][0], ny = y + dir[d][1]; // (nx, ny) -> (x, y)
 			
