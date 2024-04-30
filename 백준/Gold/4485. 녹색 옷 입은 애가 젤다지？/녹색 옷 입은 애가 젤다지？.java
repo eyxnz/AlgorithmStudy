@@ -1,46 +1,26 @@
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.util.Arrays;
-import java.util.PriorityQueue;
-import java.util.StringTokenizer;
-
-class Point implements Comparable<Point> {
-	int x;
-	int y;
-	int cost;
-	
-	public Point(int x, int y, int cost) {
-		this.x = x;
-		this.y = y;
-		this.cost = cost;
-	}
-
-	@Override
-	public int compareTo(Point o) {
-		return Integer.compare(cost, o.cost);
-	}
-}
+import java.io.*;
+import java.util.*;
 
 public class Main {
-	static int T = 1;
 	static int N;
 	static int[][] arr;
 	
-	static int[][] dir = {{1, 0}, {0, 1}, {-1, 0}, {0, -1}};
+	static int[][] dir = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
 	
 	public static void main(String[] args) throws Exception {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		StringBuilder sb = new StringBuilder();
 		StringTokenizer st;
-		
+
+		int T = 1;
 		while(true) {
 			N = Integer.parseInt(br.readLine());
-			
 			if(N == 0) {
 				break;
 			}
 			
 			arr = new int[N][N];
+			
 			for(int i = 0; i < N; i++) {
 				st = new StringTokenizer(br.readLine(), " ");
 				
@@ -49,9 +29,8 @@ public class Main {
 				}
 			}
 			
-			sb.append("Problem ").append(T).append(": ");
-			sb.append(dijkstra(0, 0));
-			sb.append("\n");
+			int answer = dijkstra();
+			sb.append("Problem ").append(T).append(": ").append(answer).append("\n");
 			
 			T++;
 		}
@@ -59,39 +38,38 @@ public class Main {
 		System.out.print(sb.toString());
 	}
 
-	private static int dijkstra(int x, int y) {
-		PriorityQueue<Point> pq = new PriorityQueue<>();
+	private static int dijkstra() {
+		PriorityQueue<int[]> pq = new PriorityQueue<>((o1, o2) -> {
+			return Integer.compare(o1[2], o2[2]);
+		});
 		int[][] dist = new int[N][N];
 		for(int i = 0; i < N; i++) {
 			Arrays.fill(dist[i], Integer.MAX_VALUE);
 		}
 		
-		pq.offer(new Point(x, y, arr[x][y]));
-		dist[x][y] = arr[x][y];
+		pq.offer(new int[] {0, 0, arr[0][0]});
+		dist[0][0] = arr[0][0];
 		
 		while(!pq.isEmpty()) {
-			Point p = pq.poll();
-			x = p.x;
-			y = p.y;
-			int cost = p.cost;
+			int[] now = pq.poll();
+			int x = now[0], y = now[1], cost = now[2];
 			
-			if(cost > dist[x][y]) {
+			if(dist[x][y] < cost) {
 				continue;
 			}
 			
-			for(int d = 0; d < 4; d++) {
+			for(int d = 0; d < dir.length; d++) {
 				int nx = x + dir[d][0], ny = y + dir[d][1];
+				
 				if(nx < 0 || nx >= N || ny < 0 || ny >= N) {
 					continue;
 				}
 				
-				int ncost = cost + arr[nx][ny];
-				if(ncost >= dist[nx][ny]) {
-					continue;
+				int newCost = cost + arr[nx][ny];
+				if(dist[nx][ny] > newCost) {
+					pq.offer(new int[] {nx, ny, newCost});
+					dist[nx][ny] = newCost;
 				}
-				
-				pq.offer(new Point(nx, ny, ncost));
-				dist[nx][ny] = ncost;
 			}
 		}
 		
