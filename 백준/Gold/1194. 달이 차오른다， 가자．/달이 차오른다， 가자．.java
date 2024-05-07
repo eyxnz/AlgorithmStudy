@@ -1,37 +1,22 @@
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.util.LinkedList;
-import java.util.Queue;
-import java.util.StringTokenizer;
-
-class Point {
-	int x;
-	int y;
-	int z;
-	
-	public Point(int x, int y, int z) {
-		this.x = x;
-		this.y = y;
-		this.z = z;
-	}
-}
+import java.io.*;
+import java.util.*;
 
 public class Main {
-	static int N, M;
-	static char[][] maze;
-	static int X, Y; // 민식이의 현재 위치
+	static int N, M; // 세로, 가로
+	static int sx, sy; // 민식이의 현재 위치
+	static char[][] maze; // 미로
 	
-	static int[][] dir = {{1, 0}, {0, 1}, {-1, 0}, {0, -1}}; // 이동 방향
+	static int[][] dir = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
 	
-	public static void main(String[] args) throws Exception { // 민식이가 미로를 탈출하는데 걸리는 이동 횟수의 최솟값
+	public static void main(String[] args) throws Exception {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		StringTokenizer st;
 		
 		st = new StringTokenizer(br.readLine(), " ");
 		N = Integer.parseInt(st.nextToken());
 		M = Integer.parseInt(st.nextToken());
-		maze = new char[N][M];
 		
+		maze = new char[N][M];
 		for(int i = 0; i < N; i++) {
 			String temp = br.readLine();
 			
@@ -39,30 +24,33 @@ public class Main {
 				maze[i][j] = temp.charAt(j);
 				
 				if(maze[i][j] == '0') {
-					X = i;
-					Y = j;
+					sx = i;
+					sy = j;
 				}
 			}
 		}
 		
-		System.out.println(bfs(X, Y));
+		System.out.println(bfs());
 	}
 
-	private static int bfs(int x, int y) {
-		Queue<Point> queue = new LinkedList<>();
-		int[][][] visited = new int[N][M][64]; // 열쇠 보유 여부 체크 -> 1 1 1 1 1 1 = 32 + 16 + 8 + 4 + 2 + 1 = 63
+	private static int bfs() {
+		Queue<int[]> queue = new LinkedList<>();
+		int[][][] visited = new int[N][M][1 << 6];
+		for(int i = 0; i < N; i++) {
+			for(int j = 0; j < M; j++) {
+				Arrays.fill(visited[i][j], -1);
+			}
+		}
 		
-		queue.offer(new Point(x, y, 0));
-		visited[x][y][0] = 1;
+		queue.offer(new int[] {sx, sy, 0});
+		visited[sx][sy][0] = 0;
 		
 		while(!queue.isEmpty()) {
-			Point p = queue.poll();
-			x = p.x;
-			y = p.y;
-			int z = p.z;
+			int[] now = queue.poll();
+			int x = now[0], y = now[1], keys = now[2];
 			
 			if(maze[x][y] == '1') {
-				return visited[x][y][z] - 1;
+				return visited[x][y][keys];
 			}
 			
 			for(int d = 0; d < dir.length; d++) {
@@ -74,33 +62,50 @@ public class Main {
 				if(maze[nx][ny] == '#') { // 벽
 					continue;
 				}
-				if(visited[nx][ny][z] != 0) { // 현재 상태에서 이미 방문
+				
+				// 열쇠
+				if(0 <= maze[nx][ny] - 'a' && maze[nx][ny] - 'a' <= 5) {
+					int key = maze[nx][ny] - 'a';
+					int newKeys = keys;
+					
+					if((keys & (1 << key)) == 0) { // 새로운 열쇠라면
+						newKeys |= (1 << key);
+					}
+					
+					if(visited[nx][ny][newKeys] != -1) {
+						continue;
+					}
+					
+					queue.offer(new int[] {nx, ny, newKeys});
+					visited[nx][ny][newKeys] = visited[x][y][keys] + 1;
+					
 					continue;
 				}
 				
-				if(maze[nx][ny] == 'a' || maze[nx][ny] == 'b' || maze[nx][ny] == 'c' || maze[nx][ny] == 'd' || maze[nx][ny] == 'e' || maze[nx][ny] == 'f') { // 열쇠
-					int key = maze[nx][ny] - 'a';
-					int nz = z | (1 << key);
-					
-					if(visited[nx][ny][nz] != 0) {
-						continue;
-					}
-					
-					queue.offer(new Point(nx, ny, nz));
-					visited[nx][ny][nz] = visited[x][y][z] + 1;
-				} else if(maze[nx][ny] == 'A' || maze[nx][ny] == 'B' || maze[nx][ny] == 'C' || maze[nx][ny] == 'D' || maze[nx][ny] == 'E' || maze[nx][ny] == 'F') { // 문
+				// 문
+				if(0 <= maze[nx][ny] - 'A' && maze[nx][ny] - 'A' <= 5) {
 					int door = maze[nx][ny] - 'A';
 					
-					if((z & (1 << door)) == 0) { // 열쇠가 없다면 -> 갈 수 없음
+					if((keys & (1 << door)) == 0) {
 						continue;
 					}
 					
-					queue.offer(new Point(nx, ny, z));
-					visited[nx][ny][z] = visited[x][y][z] + 1;
-				} else { // 빈 칸 + 출구
-					queue.offer(new Point(nx, ny, z));
-					visited[nx][ny][z] = visited[x][y][z] + 1;
+					if(visited[nx][ny][keys] != -1) {
+						continue;
+					}
+					
+					queue.offer(new int[] {nx, ny, keys});
+					visited[nx][ny][keys] = visited[x][y][keys] + 1;
+					
+					continue;
 				}
+				
+				// 빈 칸
+				if(visited[nx][ny][keys] != -1) {
+					continue;
+				}
+				queue.offer(new int[] {nx, ny, keys});
+				visited[nx][ny][keys] = visited[x][y][keys] + 1;
 			}
 		}
 		
