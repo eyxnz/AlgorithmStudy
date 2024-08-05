@@ -1,0 +1,5 @@
+select a.PRODUCT_ID, a.PRODUCT_NAME, a.PRICE * sum(AMOUNT) as TOTAL_SALES
+from FOOD_PRODUCT a
+join FOOD_ORDER b on a.PRODUCT_ID = b.PRODUCT_ID and year(b.PRODUCE_DATE) = 2022 and month(b.PRODUCE_DATE) = 5
+group by a.PRODUCT_ID
+order by TOTAL_SALES desc, a.PRODUCT_ID
