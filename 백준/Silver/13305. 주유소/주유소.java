@@ -20,14 +20,14 @@ public class Main {
             cost[i] = Integer.parseInt(st.nextToken());
         }
 
-        int answer = 0;
+        long answer = 0;
         int min = Integer.MAX_VALUE;
         for(int i = 0; i < N - 1; i++) {
             if(min > cost[i]) {
                 min = cost[i];
             }
 
-            answer += min * len[i];
+            answer += (long) min * len[i];
         }
 
         System.out.println(answer);
