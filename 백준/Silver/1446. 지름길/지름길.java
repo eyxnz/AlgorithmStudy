@@ -1,91 +1,98 @@
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.StringTokenizer;
+import java.io.*;
+import java.util.*;
 
-class Road implements Comparable<Road> {
-	int end;
-	int length;
-	
-	public Road(int end, int length) {
-		this.end = end;
-		this.length = length;
-	}
+class Edge implements Comparable<Edge> {
+    int node;
+    int cost;
 
-	@Override
-	public int compareTo(Road o) {
-		if(Integer.compare(end, o.end) == 0) {
-			return Integer.compare(length, o.length);
-		}
-		return Integer.compare(end, o.end);
-	}
+    public Edge(int node, int cost) {
+        this.node = node;
+        this.cost = cost;
+    }
+
+    @Override
+    public int compareTo(Edge o) {
+        return cost - o.cost;
+    }
 }
 
 public class Main {
-	static int N;
-	static int D;
-	static List<Road>[] list;
-	static int[] dp;
-	
-	public static void main(String[] args) throws Exception {
-		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		StringTokenizer st;
-		
-		st = new StringTokenizer(br.readLine(), " ");
-		N = Integer.parseInt(st.nextToken());
-		D = Integer.parseInt(st.nextToken());
-		
-		list = new ArrayList[D + 1];
-		for(int i = 0; i < D + 1; i++) {
-			list[i] = new ArrayList<>();
-		}
-		
-		for(int i = 0; i < N; i++) {
-			st = new StringTokenizer(br.readLine(), " ");
-			int start = Integer.parseInt(st.nextToken());
-			int end = Integer.parseInt(st.nextToken());
-			int length = Integer.parseInt(st.nextToken());
-			
-			if(start >= D || end > D || length >= end - start) { // 지름길의 의미가 없는 것
-				continue;
-			}
-			
-			list[start].add(new Road(end, length));
-		}
-		
-		for(int i = 0; i < D + 1; i++) {
-			Collections.sort(list[i]);
-		}
-		
-		dp = new int[D + 1]; // 0 ~ D
-		
-		for(int i = 0; i < D + 1; i++) {
-			if(i != 0) {
-				if(dp[i] != 0) { // 이미 지름길로 해당 위치로 왔을 때
-					dp[i] = Math.min(dp[i], dp[i - 1] + 1);
-				} else { // 처음 해당 위치 방문
-					dp[i] = dp[i - 1] + 1;
-				}
-			}
-			
-			if(!list[i].isEmpty()) { // 해당 위치에서 시작하는 지름길 존재
-				for(Road r : list[i]) {
-					int end = r.end;
-					int length = r.length;
-					
-					if(dp[end] != 0) {
-						dp[end] = Math.min(dp[end], dp[i] + length);
-					} else {
-						dp[end] = dp[i] + length;
-					}
-					
-					continue;
-				}
-			}
-		}
+    static int N, D;
+    static List<Edge>[] shortCuts;
 
-		System.out.println(dp[D]);
-	}
+    public static void main(String[] args) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        StringTokenizer st;
+
+        st = new StringTokenizer(br.readLine(), " ");
+        N = Integer.parseInt(st.nextToken());
+        D = Integer.parseInt(st.nextToken());
+
+        shortCuts = new ArrayList[D + 1];
+        for(int i = 0; i < D + 1; i++) {
+            shortCuts[i] = new ArrayList<>();
+        }
+
+        for(int i = 0; i < N; i++) {
+            st = new StringTokenizer(br.readLine(), " ");
+            int s = Integer.parseInt(st.nextToken());
+            int e = Integer.parseInt(st.nextToken());
+            int d = Integer.parseInt(st.nextToken());
+
+            if(s > D || e > D) {
+                continue;
+            }
+
+            shortCuts[s].add(new Edge(e, d));
+        }
+
+        System.out.println(dijkstra());
+    }
+
+    private static int dijkstra() {
+        PriorityQueue<Edge> pq = new PriorityQueue<>();
+        int[] dist = new int[D + 1];
+        Arrays.fill(dist, Integer.MAX_VALUE);
+
+        pq.offer(new Edge(0, 0));
+        dist[0] = 0;
+
+        while(!pq.isEmpty()) {
+            Edge now = pq.poll();
+            int node = now.node;
+            int cost = now.cost;
+
+            if(dist[node] < cost) {
+                continue;
+            }
+
+            for(Edge next : shortCuts[node]) {
+                int nextNode = next.node;
+                int nextCost = cost + next.cost;
+
+                if(dist[nextNode] <= nextCost) {
+                    continue;
+                }
+
+                pq.offer(new Edge(nextNode, nextCost));
+                dist[nextNode] = nextCost;
+            }
+
+            int nextNode = node + 1;
+            int nextCost = cost + 1;
+
+            if(nextNode > D) {
+                continue;
+            }
+
+            if(dist[nextNode] <= nextCost) {
+                continue;
+            }
+
+            pq.offer(new Edge(nextNode, nextCost));
+            dist[nextNode] = nextCost;
+        }
+
+        return dist[D];
+    }
 }
