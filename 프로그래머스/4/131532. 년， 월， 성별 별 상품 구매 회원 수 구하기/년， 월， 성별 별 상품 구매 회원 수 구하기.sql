@@ -1,6 +1,6 @@
-select date_format(b.SALES_DATE, "%Y") as YEAR, date_format(b.SALES_DATE, "%m") as MONTH, a.GENDER, count(distinct a.USER_ID) as USERS
-from USER_INFO a
-join ONLINE_SALE b on a.USER_ID = b.USER_ID
-where a.GENDER is not null
-group by YEAR, MONTH, a.GENDER
-order by YEAR, MONTH, a.GENDER
+select year(sales_date) as YEAR, month(sales_date) as MONTH, b.GENDER, count(distinct a.USER_ID) as USERS
+from ONLINE_SALE a
+join USER_INFO b on a.USER_ID = b.USER_ID
+where b.GENDER is not null
+group by year(sales_date), month(sales_date), b.GENDER
+order by year(sales_date), month(sales_date), b.GENDER
