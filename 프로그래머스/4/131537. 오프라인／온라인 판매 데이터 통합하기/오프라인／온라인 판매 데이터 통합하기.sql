@@ -1,11 +1,15 @@
-select date_format(SALES_DATE, '%Y-%m-%d') as SALES_DATE, PRODUCT_ID, USER_ID, SALES_AMOUNT
-from ONLINE_SALE
-where year(SALES_DATE) = 2022 and month(SALES_DATE) = 3
+with TOTAL_RESULT as (
+    select date_format(sales_date, '%Y-%m-%d') as SALES_DATE, PRODUCT_ID, USER_ID, SALES_AMOUNT
+    from ONLINE_SALE
+    where year(sales_date) = 2022 and month(sales_date) = 3
 
-union all
+    union all
 
-select date_format(SALES_DATE, '%Y-%m-%d') as SALES_DATE, PRODUCT_ID, NULL as USER_ID, SALES_AMOUNT
-from OFFLINE_SALE
-where year(SALES_DATE) = 2022 and month(SALES_DATE) = 3
+    select date_format(sales_date, '%Y-%m-%d') as SALES_DATE, PRODUCT_ID, NULL as USER_ID, SALES_AMOUNT
+    from OFFLINE_SALE
+    where year(sales_date) = 2022 and month(sales_date) = 3
+)
 
+select *
+from TOTAL_RESULT
 order by SALES_DATE, PRODUCT_ID, USER_ID
