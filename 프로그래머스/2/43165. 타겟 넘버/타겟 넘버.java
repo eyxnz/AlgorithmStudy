@@ -1,24 +1,30 @@
+import java.io.*;
+import java.util.*;
+
 class Solution {
-    static int N; // 배열 길이
-    static int answer; // 방법의 수
+    static int answer;
     
     public int solution(int[] numbers, int target) {
-        N = numbers.length;
-        subset(0, numbers, target, 0);
+        answer = 0;
+        
+        dfs(0, 0, numbers, target);
         
         return answer;
     }
     
-    public void subset(int depth, int[] numbers, int target, int total) {
-        if(depth == N) {
-            if(target == total) {
+    void dfs(int depth, int sum, int[] numbers, int target) {
+        if(depth == numbers.length) {
+            if(sum == target) {
                 answer++;
             }
             
             return;
         }
         
-        subset(depth + 1, numbers, target, total - numbers[depth]);
-        subset(depth + 1, numbers, target, total + numbers[depth]);
+        // +
+        dfs(depth + 1, sum + numbers[depth], numbers, target);
+        
+        // -
+        dfs(depth + 1, sum - numbers[depth], numbers, target);
     }
 }
